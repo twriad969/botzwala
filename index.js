@@ -12,7 +12,7 @@ app.get('/', (req, res) => res.send('Telegram bot is running!'));
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
-const API_TOKEN = process.env.API_TOKEN || '6953859072:AAFZk5zU6xS5fCLkX87VL1D7zFaM1fp0STo';
+const API_TOKEN = process.env.API_TOKEN || '7028659793:AAFmyBeNEx8nl2YgNrIgbRQg0LwAby1AlLc';
 const CHANNEL_USERNAME = '@BotzWala';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
