@@ -1,0 +1,19 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot for downloading videos from Terabox.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "node-telegram-bot-api": "^0.50.0"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "author": "Your Name",
+  "license": "ISC"
+}
