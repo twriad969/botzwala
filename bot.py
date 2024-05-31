@@ -221,7 +221,7 @@ def getMessage():
 @app.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=f"https://<your-heroku-app-name>.herokuapp.com/{API_TOKEN}")
+    bot.set_webhook(url=f"https://bot1xxx-ff78eae8e9b0.herokuapp.com/{API_TOKEN}")
     return "!", 200
 
 if __name__ == "__main__":
