@@ -4,11 +4,13 @@ import requests
 import json
 import time
 import os
+import flask
+from threading import Thread
 
 # Bot Token
 API_TOKEN = '6806028440:AAE-uNk50Rs1UfIKmjvBhh86n_jmydcgH4M'
 CHANNEL_USERNAME = '@BotzWala'
-ADMIN_IDS = ['6135009699', '1287563568' , '6402220718']  # Add another admin ID here
+ADMIN_IDS = ['6135009699', '1287563568', '6402220718']  # Add another admin ID here
 
 bot = telebot.TeleBot(API_TOKEN)
 
@@ -198,7 +200,7 @@ def check_api(message):
     else:
         bot.send_message(message.chat.id, "🚫 You don't have permission to view the current API.")
 
-#ok
+# Admin command to change the API
 @bot.message_handler(commands=['change'])
 def change_api(message):
     user_id = str(message.from_user.id)
@@ -208,5 +210,21 @@ def change_api(message):
     else:
         bot.send_message(message.chat.id, "🚫 You don't have permission to change the API.")
 
-# Polling
-bot.polling()
+# Start Flask app for Heroku
+app = flask.Flask(__name__)
+
+@app.route('/')
+def index():
+    return 'Bot is running!'
+
+def start_flask():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
+# Start polling in a separate thread
+def start_polling():
+    bot.polling()
+
+if __name__ == '__main__':
+    Thread(target=start_flask).start()
+    Thread(target=start_polling).start()
