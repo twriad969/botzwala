@@ -5,10 +5,10 @@ import json
 import time
 import os
 from flask import Flask, request
-from threading import Thread
+import logging
 
-# Read the API token from environment variables
-API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
+# Bot Token
+API_TOKEN = os.getenv('API_TOKEN')
 CHANNEL_USERNAME = '@BotzWala'
 ADMIN_IDS = ['6135009699', '1287563568', '6402220718']
 
@@ -122,7 +122,7 @@ def send_verification_prompt(message):
     short_url = get_short_url(long_url)
 
     verify_button = InlineKeyboardButton(text="🔑 Click here to verify", url=short_url)
-    tutorial_button = InlineKeyboardButton(text="📖 How to verify", url="https://example.com/tutorial")
+    tutorial_button = InlineKeyboardButton(text="📖 How to verify", url="https://t.me/OpenLinksTutorial/3")
     markup.add(verify_button)
     markup.add(tutorial_button)
 
@@ -200,7 +200,7 @@ def check_api(message):
     else:
         bot.send_message(message.chat.id, "🚫 You don't have permission to view the current API.")
 
-# Admin command to change the API
+# Admin command to change current API
 @bot.message_handler(commands=['change'])
 def change_api(message):
     user_id = str(message.from_user.id)
@@ -210,21 +210,22 @@ def change_api(message):
     else:
         bot.send_message(message.chat.id, "🚫 You don't have permission to change the API.")
 
-# Start Flask app for Heroku
+# Flask app to keep the bot alive
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return 'Bot is running!'
+@app.route('/' + API_TOKEN, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
 
-def start_flask():
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=f"https://<your-heroku-app-name>.herokuapp.com/{API_TOKEN}")
+    return "!", 200
 
-# Start polling in a separate thread
-def start_polling():
-    bot.polling()
-
-if __name__ == '__main__':
-    Thread(target=start_flask).start()
-    Thread(target=start_polling).start()
+if __name__ == "__main__":
+    # Set logging to debug level
+    logging.basicConfig(level=logging.DEBUG)
+    # Run the Flask app
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
