@@ -4,13 +4,13 @@ import requests
 import json
 import time
 import os
-import flask
+from flask import Flask, request
 from threading import Thread
 
 # Read the API token from environment variables
 API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
 CHANNEL_USERNAME = '@BotzWala'
-ADMIN_IDS = ['6135009699', '1287563568', '6402220718']  # Add another admin ID here
+ADMIN_IDS = ['6135009699', '1287563568', '6402220718']
 
 bot = telebot.TeleBot(API_TOKEN)
 
@@ -211,7 +211,7 @@ def change_api(message):
         bot.send_message(message.chat.id, "🚫 You don't have permission to change the API.")
 
 # Start Flask app for Heroku
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 @app.route('/')
 def index():
