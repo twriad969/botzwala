@@ -12,7 +12,7 @@ app.get('/', (req, res) => res.send('Telegram bot is running!'));
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
-const API_TOKEN = process.env.API_TOKEN || '7198843527:AAE7CVIf6zaByCnbPz-OLsyrwZQSqo8SxZU';
+const API_TOKEN = process.env.API_TOKEN || '6953859072:AAFZk5zU6xS5fCLkX87VL1D7zFaM1fp0STo';
 const CHANNEL_USERNAME = '@BotzWala';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
@@ -140,7 +140,7 @@ bot.onText(/https:\/\/(1024terabox|teraboxapp|freeterabox)\.com\/s\//, async (ms
 const sendVerificationPrompt = async (msg) => {
     const userId = msg.from.id.toString();
     const uniqueId = `${userId}_${Date.now()}`;
-    const longUrl = `https://telegram.me/TSaveBZWBot?start=${uniqueId}`;
+    const longUrl = `https://telegram.me/TeraboxAdsFreeBot?start=${uniqueId}`;
     const shortUrl = await getShortUrl(longUrl);
 
     const verifyButton = {
