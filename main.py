@@ -7,8 +7,8 @@ import os
 import flask
 from threading import Thread
 
-# Bot Token
-API_TOKEN = '6806028440:AAE-uNk50Rs1UfIKmjvBhh86n_jmydcgH4M'
+# Read the API token from environment variables
+API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
 CHANNEL_USERNAME = '@BotzWala'
 ADMIN_IDS = ['6135009699', '1287563568', '6402220718']  # Add another admin ID here
 
