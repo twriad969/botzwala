@@ -12,8 +12,8 @@ app.get('/', (req, res) => res.send('Telegram bot is running!'));
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
-const API_TOKEN = process.env.API_TOKEN || '7028659793:AAFmyBeNEx8nl2YgNrIgbRQg0LwAby1AlLc';
-const CHANNEL_USERNAME = '@BotzWala';
+const API_TOKEN = process.env.API_TOKEN || '7369796586:AAHCDcLXwn8pstdTrnbWtOo1FDj0L4LcwOw';
+const CHANNEL_USERNAME = '@terabox_video_down';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
 const bot = new TelegramBot(API_TOKEN, { polling: true });
@@ -24,8 +24,8 @@ const API_FILE = 'api.json';
 
 // Default APIs
 const APIs = [
-    "https://publicearn.com/api?api=c0c3fb3216826b7e107e17b161c06f7fd2c7fe78&url=",
-    "https://publicearn.com/api?api=fd0f68b969f0b61e5f274f9a389d3df82faec11e&url="
+    "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url=",
+    "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url="
 ];
 
 // Load data from file
@@ -90,7 +90,7 @@ bot.onText(/\/start/, async (msg) => {
         const subscribeButton = {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: "📢 Subscribe to channel", url: `https://t.me/BotzWala` }]
+                    [{ text: "📢 Subscribe to channel", url: `https://t.me/terabox_video_down` }]
                 ]
             }
         };
@@ -118,7 +118,7 @@ bot.onText(/https:\/\/(1024terabox|teraboxapp|freeterabox)\.com\/s\//, async (ms
         const subscribeButton = {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: "📢 Subscribe to channel", url: `https://t.me/BotzWala` }]
+                    [{ text: "📢 Subscribe to channel", url: `https://t.me/terabox_video_down` }]
                 ]
             }
         };
@@ -140,7 +140,7 @@ bot.onText(/https:\/\/(1024terabox|teraboxapp|freeterabox)\.com\/s\//, async (ms
 const sendVerificationPrompt = async (msg) => {
     const userId = msg.from.id.toString();
     const uniqueId = `${userId}_${Date.now()}`;
-    const longUrl = `https://telegram.me/TeraboxBZWBot?start=${uniqueId}`;
+    const longUrl = `https://telegram.me/teravideosaverbot?start=${uniqueId}`;
     const shortUrl = await getShortUrl(longUrl);
 
     const verifyButton = {
@@ -183,7 +183,7 @@ const processTeraboxLink = async (msg, userId) => {
             await bot.editMessageText("⬇️ Downloading the video...", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
             const videoFilename = await downloadVideo(videoUrl);
             await bot.editMessageText("⬆️ Uploading the video...", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
-            await bot.sendVideo(msg.chat.id, videoFilename, { caption: "🎥 Your video is downloaded\n\nJoin @BotzWala For More Updates" });
+            await bot.sendVideo(msg.chat.id, videoFilename, { caption: "🎥 Your video is downloaded\n\nJoin @terabox_video_down For More Updates" });
             fs.unlinkSync(videoFilename);
             await bot.deleteMessage(msg.chat.id, progressMessage.message_id);
         } else {
