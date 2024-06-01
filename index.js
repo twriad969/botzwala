@@ -107,7 +107,7 @@ bot.onText(/\/start/, async (msg) => {
         saveData(data, DATA_FILE);
     }
 
-    bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @BotzWala For More Updates");
+    bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @terabox_video_down For More Updates");
 });
 
 // Handle Terabox link
@@ -147,7 +147,7 @@ const sendVerificationPrompt = async (msg) => {
         reply_markup: {
             inline_keyboard: [
                 [{ text: "🔑 Click here to verify", url: shortUrl }],
-                [{ text: "📖 How to verify", url: "https://t.me/OpenLinksTutorial/3" }]
+                [{ text: "📖 How to verify", url: "https://t.me/dterabox/4" }]
             ]
         }
     };
@@ -187,7 +187,7 @@ const processTeraboxLink = async (msg, userId) => {
             fs.unlinkSync(videoFilename);
             await bot.deleteMessage(msg.chat.id, progressMessage.message_id);
         } else {
-            await bot.editMessageText("❌ Failed to process the link.", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
+            await bot.editMessageText("❌ Failed to process the link. ", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
         }
     } catch (error) {
         await bot.editMessageText("❌ Failed to process the link.", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
