@@ -1,9 +1,8 @@
-// Importing required libraries
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
 // Initialize Express server
 const app = express();
@@ -19,14 +18,7 @@ const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another adm
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
 // External API for user data
-const USER_DATA_API = 'https://mlobd.online/data';
-const API_FILE = 'api.json';
-
-// Default APIs
-const APIs = [
-    "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url=",
-    "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url="
-];
+const USER_DATA_API = 'https://mlobd.online/data/';
 
 // Load data from API
 const loadData = async () => {
@@ -42,29 +34,40 @@ const loadData = async () => {
 // Save data to API
 const saveData = async (data) => {
     try {
-        await axios.post(USER_DATA_API, data);
+        await axios.post(USER_DATA_API, data, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     } catch (error) {
         console.error('Error saving data:', error.message);
     }
 };
 
 // Initial data load
-let data = await loadData();
-let apiData = fs.existsSync(API_FILE) ? JSON.parse(fs.readFileSync(API_FILE)) : {};
+let data = {};
 
-// Set default API if not present in file
-if (!apiData.current_api) {
-    apiData.current_api = APIs[0];
-    fs.writeFileSync(API_FILE, JSON.stringify(apiData, null, 4));
-}
+const init = async () => {
+    data = await loadData();
+
+    // Set default API if not present in file
+    if (!data.apiData) {
+        data.apiData = { current_api: "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url=" };
+        await saveData(data);
+    }
+};
 
 // Function to toggle the API
-const toggleApi = () => {
-    const currentIndex = APIs.indexOf(apiData.current_api);
+const toggleApi = async () => {
+    const APIs = [
+        "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url=",
+        "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url="
+    ];
+    const currentIndex = APIs.indexOf(data.apiData.current_api);
     const newIndex = (currentIndex + 1) % APIs.length;
-    apiData.current_api = APIs[newIndex];
-    fs.writeFileSync(API_FILE, JSON.stringify(apiData, null, 4));
-    return apiData.current_api;
+    data.apiData.current_api = APIs[newIndex];
+    await saveData(data);
+    return data.apiData.current_api;
 };
 
 // Check subscription status
@@ -167,7 +170,7 @@ const sendVerificationPrompt = async (msg) => {
 };
 
 const getShortUrl = async (longUrl) => {
-    const apiUrl = `${apiData.current_api}${longUrl}`;
+    const apiUrl = `${data.apiData.current_api}${longUrl}`;
     try {
         const response = await axios.get(apiUrl);
         if (response.status === 200 && response.data.shortenedUrl) {
@@ -193,8 +196,8 @@ const processTeraboxLink = async (msg, userId) => {
             await bot.sendVideo(msg.chat.id, videoFilename, { caption: "🎥 Your video is downloaded\n\nJoin @terabox_video_down For More Updates" });
             fs.unlinkSync(videoFilename);
             await bot.deleteMessage(msg.chat.id, progressMessage.message_id);
-            
-            // Increment the processed links count
+
+            // Track processed links
             if (!data[userId].processed_links) {
                 data[userId].processed_links = 0;
             }
@@ -229,8 +232,8 @@ bot.onText(/\/ronok/, async (msg) => {
     if (ADMIN_IDS.includes(userId)) {
         const totalUsers = Object.keys(data).length;
         const verifiedUsers = Object.values(data).filter(user => user.verify_time && (Date.now() - user.verify_time <= 12 * 60 * 60 * 1000)).length;
-        const processedLinks = Object.values(data).reduce((acc, user) => acc + (user.processed_links || 0), 0);
-        bot.sendMessage(msg.chat.id, `📊 Total users: ${totalUsers}\n✅ Verified users: ${verifiedUsers}\n🔗 Processed links: ${processedLinks}`);
+        const totalProcessedLinks = Object.values(data).reduce((acc, user) => acc + (user.processed_links || 0), 0);
+        bot.sendMessage(msg.chat.id, `📊 Total users: ${totalUsers}\n✅ Verified users: ${verifiedUsers}\n🔗 Processed links: ${totalProcessedLinks}`);
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to view the stats.");
     }
@@ -253,33 +256,36 @@ bot.onText(/\/broad (.+)/, async (msg, match) => {
 bot.onText(/\/api/, (msg) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
-        bot.sendMessage(msg.chat.id, `🔗 Current API: ${apiData.current_api}`);
+        bot.sendMessage(msg.chat.id, `🔗 Current API: ${data.apiData.current_api}`);
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to view the current API.");
     }
 });
 
 // Admin command to change API
-bot.onText(/\/change/, (msg) => {
+bot.onText(/\/change/, async (msg) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
-        const newApi = toggleApi();
+        const newApi = await toggleApi();
         bot.sendMessage(msg.chat.id, `🔄 API has been changed.\n🔗 Current API: ${newApi}`);
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to change the API.");
     }
 });
 
-// Admin command to reset verification status
+// Admin command to reset verification
 bot.onText(/\/reset/, async (msg) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
-        Object.keys(data).forEach(user => {
+        for (const user of Object.keys(data)) {
             data[user].verify_time = null;
-        });
+        }
         await saveData(data);
-        bot.sendMessage(msg.chat.id, "🔄 All users have been reset. They will need to verify their access again.");
+        bot.sendMessage(msg.chat.id, "🔄 All user verifications have been reset.");
     } else {
-        bot.sendMessage(msg.chat.id, "🚫 You don't have permission to reset users.");
+        bot.sendMessage(msg.chat.id, "🚫 You don't have permission to reset verifications.");
     }
 });
+
+// Initialize data on start
+init();
