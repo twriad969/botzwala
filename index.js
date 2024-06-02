@@ -1,9 +1,9 @@
 // Importing required libraries
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
-const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
 
 // Initialize Express server
 const app = express();
@@ -18,8 +18,8 @@ const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another adm
 
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
-// Data file to keep track of users and their access
-const DATA_FILE = 'data.json';
+// External API for user data
+const USER_DATA_API = 'https://your-api.com/userdata';
 const API_FILE = 'api.json';
 
 // Default APIs
@@ -28,27 +28,34 @@ const APIs = [
     "https://teraboxlinks.com/api?api=768a5bbc3c692eba5e15f8e4a37193ddc759c8ed&url="
 ];
 
-// Load data from file
-const loadData = (filePath) => {
-    if (fs.existsSync(filePath)) {
-        return JSON.parse(fs.readFileSync(filePath));
+// Load data from API
+const loadData = async () => {
+    try {
+        const response = await axios.get(USER_DATA_API);
+        return response.data || {};
+    } catch (error) {
+        console.error('Error loading data:', error.message);
+        return {};
     }
-    return {};
 };
 
-// Save data to file
-const saveData = (data, filePath) => {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
+// Save data to API
+const saveData = async (data) => {
+    try {
+        await axios.post(USER_DATA_API, data);
+    } catch (error) {
+        console.error('Error saving data:', error.message);
+    }
 };
 
 // Initial data load
-let data = loadData(DATA_FILE);
-let apiData = loadData(API_FILE);
+let data = await loadData();
+let apiData = fs.existsSync(API_FILE) ? JSON.parse(fs.readFileSync(API_FILE)) : {};
 
 // Set default API if not present in file
 if (!apiData.current_api) {
     apiData.current_api = APIs[0];
-    saveData(apiData, API_FILE);
+    fs.writeFileSync(API_FILE, JSON.stringify(apiData, null, 4));
 }
 
 // Function to toggle the API
@@ -56,7 +63,7 @@ const toggleApi = () => {
     const currentIndex = APIs.indexOf(apiData.current_api);
     const newIndex = (currentIndex + 1) % APIs.length;
     apiData.current_api = APIs[newIndex];
-    saveData(apiData, API_FILE);
+    fs.writeFileSync(API_FILE, JSON.stringify(apiData, null, 4));
     return apiData.current_api;
 };
 
@@ -80,7 +87,7 @@ bot.onText(/\/start/, async (msg) => {
         const [storedId, timestamp] = uniqueId.split('_');
         if (userId === storedId) {
             data[userId] = { verify_time: Date.now() };
-            saveData(data, DATA_FILE);
+            await saveData(data);
             bot.sendMessage(msg.chat.id, "🎉 You have successfully verified! You can use the bot for the next 12 hours.");
             return;
         }
@@ -104,7 +111,7 @@ bot.onText(/\/start/, async (msg) => {
 
     if (!data[userId] || !data[userId].verify_time) {
         data[userId] = { verify_time: null };
-        saveData(data, DATA_FILE);
+        await saveData(data);
     }
 
     bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @terabox_video_down For More Updates");
@@ -186,6 +193,13 @@ const processTeraboxLink = async (msg, userId) => {
             await bot.sendVideo(msg.chat.id, videoFilename, { caption: "🎥 Your video is downloaded\n\nJoin @terabox_video_down For More Updates" });
             fs.unlinkSync(videoFilename);
             await bot.deleteMessage(msg.chat.id, progressMessage.message_id);
+            
+            // Increment the processed links count
+            if (!data[userId].processed_links) {
+                data[userId].processed_links = 0;
+            }
+            data[userId].processed_links += 1;
+            await saveData(data);
         } else {
             await bot.editMessageText("❌ Failed to process the link. ", { chat_id: msg.chat.id, message_id: progressMessage.message_id });
         }
@@ -210,19 +224,20 @@ const downloadVideo = async (videoUrl) => {
 };
 
 // Admin command to view stats
-bot.onText(/\/ronok/, (msg) => {
+bot.onText(/\/ronok/, async (msg) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
         const totalUsers = Object.keys(data).length;
         const verifiedUsers = Object.values(data).filter(user => user.verify_time && (Date.now() - user.verify_time <= 12 * 60 * 60 * 1000)).length;
-        bot.sendMessage(msg.chat.id, `📊 Total users: ${totalUsers}\n✅ Verified users: ${verifiedUsers}`);
+        const processedLinks = Object.values(data).reduce((acc, user) => acc + (user.processed_links || 0), 0);
+        bot.sendMessage(msg.chat.id, `📊 Total users: ${totalUsers}\n✅ Verified users: ${verifiedUsers}\n🔗 Processed links: ${processedLinks}`);
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to view the stats.");
     }
 });
 
 // Admin command to broadcast message
-bot.onText(/\/broad (.+)/, (msg, match) => {
+bot.onText(/\/broad (.+)/, async (msg, match) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
         const text = match[1];
@@ -256,13 +271,13 @@ bot.onText(/\/change/, (msg) => {
 });
 
 // Admin command to reset verification status
-bot.onText(/\/reset/, (msg) => {
+bot.onText(/\/reset/, async (msg) => {
     const userId = msg.from.id.toString();
     if (ADMIN_IDS.includes(userId)) {
         Object.keys(data).forEach(user => {
             data[user].verify_time = null;
         });
-        saveData(data, DATA_FILE);
+        await saveData(data);
         bot.sendMessage(msg.chat.id, "🔄 All users have been reset. They will need to verify their access again.");
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to reset users.");
