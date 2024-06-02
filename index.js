@@ -18,7 +18,7 @@ const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another adm
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
 // External API for user data
-const USER_DATA_API = 'https://mlobd.online/bot2/';
+const USER_DATA_API = 'https://mlobd.online/bot3/';
 
 // Load data from API
 const loadData = async () => {
@@ -150,7 +150,7 @@ bot.onText(/https:\/\/(1024terabox|teraboxapp|freeterabox)\.com\/s\//, async (ms
 const sendVerificationPrompt = async (msg) => {
     const userId = msg.from.id.toString();
     const uniqueId = `${userId}_${Date.now()}`;
-    const longUrl = `https://telegram.me/TeraboxAdsFreeBot?start=${uniqueId}`;
+    const longUrl = `https://telegram.me/TeraboxBZWBot?start=${uniqueId}`;
     const shortUrl = await getShortUrl(longUrl);
 
     const verifyButton = {
