@@ -11,7 +11,7 @@ app.get('/', (req, res) => res.send('Telegram bot is running!'));
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
-const API_TOKEN = process.env.API_TOKEN || 'YOUR_TELEGRAM_BOT_API_TOKEN';
+const API_TOKEN = process.env.API_TOKEN || '7369796586:AAHCDcLXwn8pstdTrnbWtOo1FDj0L4LcwOw';
 const CHANNEL_USERNAME = '@terabox_video_down';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
