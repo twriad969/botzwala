@@ -18,7 +18,7 @@ const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another adm
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
 // External API for user data
-const USER_DATA_API = 'https://mlobd.online/bot1/';
+const USER_DATA_API = 'https://mlobd.online/bot2/';
 
 // Load data from API
 const loadData = async () => {
