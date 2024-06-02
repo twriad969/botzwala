@@ -12,7 +12,7 @@ app.get('/', (req, res) => res.send('Telegram bot is running!'));
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
-const API_TOKEN = process.env.API_TOKEN || '7369796586:AAHCDcLXwn8pstdTrnbWtOo1FDj0L4LcwOw';
+const API_TOKEN = process.env.API_TOKEN || 'YOUR_TELEGRAM_BOT_API_TOKEN';
 const CHANNEL_USERNAME = '@terabox_video_down';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
@@ -252,5 +252,19 @@ bot.onText(/\/change/, (msg) => {
         bot.sendMessage(msg.chat.id, `🔄 API has been changed.\n🔗 Current API: ${newApi}`);
     } else {
         bot.sendMessage(msg.chat.id, "🚫 You don't have permission to change the API.");
+    }
+});
+
+// Admin command to reset verification status
+bot.onText(/\/reset/, (msg) => {
+    const userId = msg.from.id.toString();
+    if (ADMIN_IDS.includes(userId)) {
+        Object.keys(data).forEach(user => {
+            data[user].verify_time = null;
+        });
+        saveData(data, DATA_FILE);
+        bot.sendMessage(msg.chat.id, "🔄 All users have been reset. They will need to verify their access again.");
+    } else {
+        bot.sendMessage(msg.chat.id, "🚫 You don't have permission to reset users.");
     }
 });
