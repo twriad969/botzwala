@@ -120,8 +120,7 @@ bot.onText(/\/start/, async (msg) => {
     bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @botzwala For More Updates");
 });
 
-// Handle Terabox link
-bot.onText(/https:\/\/(1024terabox|teraboxapp|freeterabox)\.com\/s\//, async (msg) => {
+bot.onText(/https:\/\/(www\.)?(1024terabox|teraboxapp|freeterabox|mirrobox|nephobox|1024tera|4funbox|momerybox|tibibox|terabox|terabox\.app|terabox\.fun|teraboxapp|teraboxapp)\.com\/s\//, async (msg) => {
     const userId = msg.from.id.toString();
 
     if (!(await checkSubscription(userId))) {
