@@ -52,7 +52,7 @@ const init = async () => {
 
     // Set default API if not present in file
     if (!data.apiData) {
-        data.apiData = { current_api: "https://publicearn.com/api?api=c0c3fb3216826b7e107e17b161c06f7fd2c7fe78&url=" };
+        data.apiData = { current_api: "https://inshorturl.com/api?api=c16399f5b56cce74ff65e7b2763bf42b3d63e865&url=" };
         await saveData(data);
     }
 };
@@ -60,7 +60,7 @@ const init = async () => {
 // Function to toggle the API
 const toggleApi = async () => {
     const APIs = [
-        "https://publicearn.com/api?api=c0c3fb3216826b7e107e17b161c06f7fd2c7fe78&url=",
+        "https://inshorturl.com/api?api=c16399f5b56cce74ff65e7b2763bf42b3d63e865&url=",
         "https://publicearn.com/api?api=fd0f68b969f0b61e5f274f9a389d3df82faec11e&url="
     ];
     const currentIndex = APIs.indexOf(data.apiData.current_api);
