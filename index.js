@@ -12,7 +12,7 @@ app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 // Bot Token
 const API_TOKEN = process.env.API_TOKEN || '7198843527:AAE7CVIf6zaByCnbPz-OLsyrwZQSqo8SxZU';
-const CHANNEL_USERNAME = '@terabox_video_down';
+const CHANNEL_USERNAME = '@botzwala';
 const ADMIN_IDS = ['6135009699', '1287563568', '6402220718']; // Add another admin ID here
 
 const bot = new TelegramBot(API_TOKEN, { polling: true });
@@ -100,7 +100,7 @@ bot.onText(/\/start/, async (msg) => {
         const subscribeButton = {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: "📢 Subscribe to channel", url: `https://t.me/terabox_video_down` }]
+                    [{ text: "📢 Subscribe to channel", url: `https://t.me/botzwala` }]
                 ]
             }
         };
@@ -117,7 +117,7 @@ bot.onText(/\/start/, async (msg) => {
         await saveData(data);
     }
 
-    bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @terabox_video_down For More Updates");
+    bot.sendMessage(msg.chat.id, "Hello, I am a bot to download videos from Terabox.\n\nJust send me the Terabox link and I will start downloading it for you.\n\nJoin @botzwala For More Updates");
 });
 
 bot.onText(/https:\/\/(www\.)?(1024terabox|teraboxapp|freeterabox|mirrobox|nephobox|1024tera|4funbox|momerybox|tibibox|terabox|terabox\.app|terabox\.fun|teraboxapp|teraboxapp)\.com\/s\//, async (msg) => {
@@ -127,7 +127,7 @@ bot.onText(/https:\/\/(www\.)?(1024terabox|teraboxapp|freeterabox|mirrobox|nepho
         const subscribeButton = {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: "📢 Subscribe to channel", url: `https://t.me/terabox_video_down` }]
+                    [{ text: "📢 Subscribe to channel", url: `https://t.me/botzwala` }]
                 ]
             }
         };
