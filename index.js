@@ -149,7 +149,7 @@ bot.onText(/https:\/\/(www\.)?(1024terabox|teraboxapp|freeterabox|mirrobox|nepho
 const sendVerificationPrompt = async (msg) => {
     const userId = msg.from.id.toString();
     const uniqueId = `${userId}_${Date.now()}`;
-    const longUrl = `https://telegram.me/teravideosaverbot?start=${uniqueId}`;
+    const longUrl = `https://telegram.me/TSaveBZWBot?start=${uniqueId}`;
     const shortUrl = await getShortUrl(longUrl);
 
     const verifyButton = {
